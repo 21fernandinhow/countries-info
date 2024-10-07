@@ -1,6 +1,8 @@
 import CountryList from "@/components/CountryList";
 import HeroContainer from "@/components/HeroContainer";
 import axios from "axios";
+import { Loader } from "lucide-react";
+import { Suspense } from "react";
 
 const getCountries = async () => {
   const countries = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/AvailableCountries`)
@@ -22,7 +24,7 @@ const HomePage = async () => {
             Find updated countries data. Just pick one:
         </p>
       </HeroContainer>
-      {countries && <CountryList countries={countries}/>}
+      <Suspense fallback={<Loader/>}>{countries && <CountryList countries={countries}/>}</Suspense> 
     </main>
   );
 }
