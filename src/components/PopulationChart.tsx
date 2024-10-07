@@ -12,7 +12,7 @@ import {
     Legend,
 } from 'chart.js'
 import { useEffect, useState } from 'react'
-import { PopulationData } from '@/app/country-info/page'
+import { PopulationData } from '@/app/country-info/[countryName]/[countryCode]/page'
 
 ChartJS.register(
     CategoryScale,

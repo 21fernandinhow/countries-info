@@ -4,7 +4,7 @@ export interface CountryItemProps{
 }
 
 const CountryItem = ({countryCode, countryName}: CountryItemProps) => (
-    <a href={`/country-info?countryCode=${countryCode}&countryName=${countryName}`} key={countryCode}>
+    <a href={`/country-info/${countryName}/${countryCode}`} key={countryCode}>
         <div className="btn btn-outline">
             <h2 className="text-xl font-semibold text-center">{countryName}</h2>
         </div>
