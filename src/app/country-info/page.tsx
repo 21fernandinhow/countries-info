@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
 import CountryItem from '@/components/CountryItem';
 import PopulationChart from '@/components/PopulationChart';
-import axios from 'axios'
+import axios from 'axios';
 import { Loader } from 'lucide-react';
-import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface CountryData {
     country: string;
@@ -19,7 +19,6 @@ interface Border {
     officialName: string;
     countryCode: string;
     region: string;
-    borders: Border[] | null;
 }
 
 export interface PopulationData {
@@ -27,69 +26,77 @@ export interface PopulationData {
     value: number;
 }
 
-const CountryInfoPage = () => {
+const CountryInfo = () => {
+    const searchParams = useSearchParams();
+    const countryName = searchParams.get('countryName');
+    const countryCode = searchParams.get('countryCode');
+    
+    const [countryData, setCountryData] = useState<CountryData>();
+    const [error, setError] = useState("");
 
-    const searchParams = useSearchParams()
-    const countryName = searchParams.get('countryName')
-    const countryCode = searchParams.get('countryCode')
-    const [countryData, setCountryData] = useState<CountryData>()
-    const [error, setError] = useState("")
+    useEffect(() => {
+        const getCountryData = async () => {
+            const apiUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')}/countryInfo/${countryCode}&${countryName}`;
+            try {
+                const res = await axios.get(apiUrl);
+                setCountryData(res.data);
+            } catch (err) {
+                setError("Error trying to get country information: " + err);
+            }
+        };
 
-    const getCountryData = async () => {
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')}/countryInfo/${countryCode}&${countryName}`;
-        axios.get(`${new URL(apiUrl)}`)
-            .then(res => setCountryData(res.data))
-            .catch(err => setError("Error trying to get country information:" + err))
+        getCountryData();
+    }, [countryCode, countryName]);
+
+    if (error) {
+        return <h2 className='text-center text-red-400 font-bold'>{error}</h2>;
     }
 
-    useEffect(()=>{
-        getCountryData()
-    },[])
-    
-    return(
-        <div className='min-h-screen flex flex-col gap-6 p-4'>
-            {countryData ?
+    return (
+        <div className='container mx-auto m-3'>
+            {countryData ? (
                 <>
-                    <div className='container mx-auto m-3'>
-                        <h2 className='text-4xl text-center font-bold'>{countryData.country}</h2>
-                        <img 
-                            src={countryData.flag} 
-                            className="my-2 mx-auto w-full max-w-[10rem] sm:max-w-[12rem] md:max-w-[14rem] lg:max-w-[16rem] xl:max-w-[18rem] rounded-sm"
-                            alt={countryData.country} 
-                        />
-                    </div>
-
-                    <div className="container mx-auto text-center m-3 p-4">
+                    <h2 className='text-4xl text-center font-bold'>{countryData.country}</h2>
+                    <img 
+                        src={countryData.flag} 
+                        className="my-2 mx-auto w-full max-w-[10rem] sm:max-w-[12rem] md:max-w-[14rem] lg:max-w-[16rem] xl:max-w-[18rem] rounded-sm"
+                        alt={countryData.country} 
+                    />
+                    
+                    <div className="text-center m-3 p-4">
                         <h3 className='font-bold text-2xl'>Borders Countries</h3>
-                        <p>This country has border with this other countries:</p>
+                        <p>This country has borders with these other countries:</p>
                         <div className="flex flex-wrap justify-center gap-2 p-2">
-                            {countryData.borders?.map((country) => <CountryItem countryCode={country.countryCode} countryName={country.commonName} key={country.countryCode}/>)}
+                            {countryData.borders?.map((country) => 
+                                <CountryItem countryCode={country.countryCode} countryName={country.commonName} key={country.countryCode} />
+                            )}
                         </div>
                     </div>
 
-                    <Suspense fallback={<Loader/>}>
-                        <div className="container mx-auto m-3">
-                            <h3 className='font-bold text-2xl text-center'>Population Data</h3>
+                    <div className="m-3">
+                        <h3 className='font-bold text-2xl text-center'>Population Data</h3>
+                        <Suspense fallback={<Loader />}>
                             {countryData.populationData.length > 0 ? (
                                 <PopulationChart populationData={countryData.populationData} />
                             ) : (
                                 <p>No population data available.</p>
                             )}
-                        </div>
-                    </Suspense>
-
+                        </Suspense>
+                    </div>
                 </>
-                :
-                <div className='container mx-auto flex items-center justify-center h-screen'>
-                    {error ?
-                        <h2 className='text-center text-red-400 font-bold'>{error}</h2>
-                        : <Loader/>
-                    }
+            ) : (
+                <div className='flex items-center justify-center h-screen'>
+                    <Loader />
                 </div>
-
-            }
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default CountryInfoPage
+const CountryInfoPage = () => (
+    <Suspense fallback={<Loader />}>
+        <CountryInfo />
+    </Suspense>
+);
+
+export default CountryInfoPage;
