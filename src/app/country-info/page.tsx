@@ -48,26 +48,26 @@ const CountryInfoPage = () => {
     
     return(
         <div className='min-h-screen flex flex-col gap-6 p-4'>
-            <Suspense fallback={<Loader/>}>
-                {countryData ?
-                    <>
-                        <div className='container mx-auto m-3'>
-                            <h2 className='text-4xl text-center font-bold'>{countryData.country}</h2>
-                            <img 
-                                src={countryData.flag} 
-                                className="my-2 mx-auto w-full max-w-[10rem] sm:max-w-[12rem] md:max-w-[14rem] lg:max-w-[16rem] xl:max-w-[18rem] rounded-sm"
-                                alt={countryData.country} 
-                            />
-                        </div>
+            {countryData ?
+                <>
+                    <div className='container mx-auto m-3'>
+                        <h2 className='text-4xl text-center font-bold'>{countryData.country}</h2>
+                        <img 
+                            src={countryData.flag} 
+                            className="my-2 mx-auto w-full max-w-[10rem] sm:max-w-[12rem] md:max-w-[14rem] lg:max-w-[16rem] xl:max-w-[18rem] rounded-sm"
+                            alt={countryData.country} 
+                        />
+                    </div>
 
-                        <div className="container mx-auto text-center m-3 p-4">
-                            <h3 className='font-bold text-2xl'>Borders Countries</h3>
-                            <p>This country has border with this other countries:</p>
-                            <div className="flex flex-wrap justify-center gap-2 p-2">
-                                {countryData.borders?.map((country) => <CountryItem countryCode={country.countryCode} countryName={country.commonName} key={country.countryCode}/>)}
-                            </div>
+                    <div className="container mx-auto text-center m-3 p-4">
+                        <h3 className='font-bold text-2xl'>Borders Countries</h3>
+                        <p>This country has border with this other countries:</p>
+                        <div className="flex flex-wrap justify-center gap-2 p-2">
+                            {countryData.borders?.map((country) => <CountryItem countryCode={country.countryCode} countryName={country.commonName} key={country.countryCode}/>)}
                         </div>
+                    </div>
 
+                    <Suspense fallback={<Loader/>}>
                         <div className="container mx-auto m-3">
                             <h3 className='font-bold text-2xl text-center'>Population Data</h3>
                             {countryData.populationData.length > 0 ? (
@@ -76,18 +76,18 @@ const CountryInfoPage = () => {
                                 <p>No population data available.</p>
                             )}
                         </div>
+                    </Suspense>
 
-                    </>
-                    :
-                    <div className='container mx-auto flex items-center justify-center h-screen'>
-                        {error ? 
-                            <h2 className='text-center text-red-400 font-bold'>{error}</h2> 
-                            : <Loader/>
-                        }
-                    </div>
-                }
-            </Suspense>
-            
+                </>
+                :
+                <div className='container mx-auto flex items-center justify-center h-screen'>
+                    {error ?
+                        <h2 className='text-center text-red-400 font-bold'>{error}</h2>
+                        : <Loader/>
+                    }
+                </div>
+
+            }
         </div>
     )
 }
